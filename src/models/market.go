@@ -26,3 +26,14 @@ func GetAllMarkets() []Market {
 
 	return markets
 }
+
+func GetMarketById(marketId int) Market{
+	rawMarket := web.GetMarketById(marketId)
+
+	return Market{
+		rawMarket["id"].(int),
+		rawMarket["name"].(string),
+		rawMarket["lat"].(float64),
+		rawMarket["long"].(float64),
+	}
+}
