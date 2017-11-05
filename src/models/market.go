@@ -1,5 +1,7 @@
 package models
 
+import "github.com/go_api/src/web"
+
 type Market struct {
 	Id		int 		`json:"id"`
 	Name	string		`json:"name"`
@@ -7,4 +9,20 @@ type Market struct {
 	Long	float64		`json:"long"`
 }
 
-type Markets []Market
+func GetAllMarkets() []Market {
+	var markets []Market
+
+	rawMarkets := web.AllMarkets()
+
+	for _, rawMarket := range rawMarkets {
+		var market = Market{
+			rawMarket["id"].(int),
+			rawMarket["name"].(string),
+			rawMarket["lat"].(float64),
+			rawMarket["long"].(float64),
+		}
+		markets = append(markets, market)
+	}
+
+	return markets
+}

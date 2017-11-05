@@ -4,10 +4,9 @@ import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"log"
-	"github.com/go_api/src/models"
 )
 
-func AllMarkets() []models.Market{
+func AllMarkets() []map[string]interface{}{
 	db, err := sql.Open("postgres", "postgresql://read_only_user:gocode@35.165.83.56:5432/magpie?sslmode=disable")
 
 	if err != nil {
@@ -20,12 +19,11 @@ func AllMarkets() []models.Market{
 		log.Fatal(rowErr)
 	}
 
-	var markets []models.Market
+	var rawMarkets []map[string]interface{}
 
 	defer rows.Close()
 
 	for rows.Next() {
-
 		var id		int
 		var name	string
 		var lat		float64
@@ -35,15 +33,18 @@ func AllMarkets() []models.Market{
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(id, name, lat, long)
 
-		market := models.Market{
-			Id: id,
-			Name: name,
-			Lat: lat,
-			Long: long,
+		var rawMarket = map[string]interface{}{
+			"id": id,
+			"name": name,
+			"lat": lat,
+			"long": long,
 		}
-		markets = append(markets, market)
+		rawMarkets = append(rawMarkets, rawMarket)
 	}
-	return markets
+	return rawMarkets
+}
+
+func GetMarketById(id int)  {
+
 }
