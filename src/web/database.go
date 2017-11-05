@@ -91,12 +91,12 @@ func GetMarketProducts(marketId int) []map[string]interface{} {
 		log.Fatal(err)
 	}
 
-	rows, rowErr := db.Query(`SELECT s.location_xref_id AS marketId, p.name AS product, ROUND(AVG(s.price))*100 as mean
+	rows, rowErr := db.Query(`SELECT s.location_xref_id AS marketId, p.id AS id, p.name AS product, ROUND( AVG(s.price)::NUMERIC, 2) as mean
 	FROM sales s
 	JOIN product_xref p
 	ON s.product_xref_id=p.id
 	WHERE s.location_xref_id = $1
-	GROUP BY marketId, product
+	GROUP BY marketId, product, p.id
 	ORDER BY marketId`, marketId)
 
 	if rowErr != nil {
@@ -108,17 +108,17 @@ func GetMarketProducts(marketId int) []map[string]interface{} {
 	defer rows.Close()
 
 	for rows.Next() {
-		var marketId		int
-		var name	string
-		var mean	int64
+		var id			int
+		var name		string
+		var mean		float64
 
-		err := rows.Scan(&marketId, &name, &mean)
+		err := rows.Scan(&marketId, &id, &name, &mean)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		var rawProduct = map[string]interface{}{
-			"marketId": marketId,
+			"id": id,
 			"name": name,
 			"mean": mean,
 		}

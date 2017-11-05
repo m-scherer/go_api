@@ -9,9 +9,9 @@ func GetMarketProducts(marketId int) []Product{
 
 	for _, rawProduct := range rawProducts {
 		var product = Product{
-			rawProduct["marketId"].(int),
+			rawProduct["id"].(int),
 			rawProduct["name"].(string),
-			rawProduct["mean"].(int64),
+			rawProduct["mean"].(float64),
 		}
 		products = append(products, product)
 	}
