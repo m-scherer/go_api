@@ -6,6 +6,10 @@ import (
 	"log"
 )
 
+//TODO: connect to the database once
+//TODO: return queries and push logic into models
+//TODO? have a generic query function that accepts a query and passes it to the db?
+
 func AllMarkets() []map[string]interface{}{
 	db, err := sql.Open("postgres", "postgresql://read_only_user:gocode@35.165.83.56:5432/magpie?sslmode=disable")
 
@@ -51,6 +55,8 @@ func GetMarketById(id int) map[string]interface{} {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//TODO: turn Query into QueryRow
 
 	row, rowErr := db.Query("SELECT id, name, lat, long FROM location_xref where id = $1", id)
 
