@@ -83,3 +83,46 @@ func GetMarketById(id int) map[string]interface{} {
 
 	return rawMarkets[0]
 }
+
+func GetMarketProducts(marketId int) []map[string]interface{} {
+	db, err := sql.Open("postgres", "postgresql://read_only_user:gocode@35.165.83.56:5432/magpie?sslmode=disable")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	rows, rowErr := db.Query(`SELECT s.location_xref_id AS marketId, p.name AS product, ROUND(AVG(s.price))*100 as mean
+	FROM sales s
+	JOIN product_xref p
+	ON s.product_xref_id=p.id
+	WHERE s.location_xref_id = $1
+	GROUP BY marketId, product
+	ORDER BY marketId`, marketId)
+
+	if rowErr != nil {
+		log.Fatal(rowErr)
+	}
+
+	var rawProducts []map[string]interface{}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var marketId		int
+		var name	string
+		var mean	int64
+
+		err := rows.Scan(&marketId, &name, &mean)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var rawProduct = map[string]interface{}{
+			"marketId": marketId,
+			"name": name,
+			"mean": mean,
+		}
+		rawProducts = append(rawProducts, rawProduct)
+	}
+	return rawProducts
+}

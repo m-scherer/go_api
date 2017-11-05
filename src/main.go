@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"log"
 	"net/http"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
@@ -9,13 +8,17 @@ import (
 	"os"
 )
 
-func main() {
+const rootApiPath string = "/api/v1"
 
+func main() {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/", controllers.Index)
-	router.HandleFunc("/markets", controllers.MarketsIndex)
-	router.HandleFunc("/markets/{marketId}", controllers.MarketShow)
+	router.HandleFunc(rootApiPath+"/markets", controllers.MarketsIndex).
+		Methods("GET")
+	router.HandleFunc(rootApiPath+"/markets/{marketId}", controllers.MarketShow).
+		Methods("GET")
+	router.HandleFunc(rootApiPath+"/markets/{marketId}/products", controllers.MarketProductIndex).
+		Methods("GET")
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 	http.ListenAndServe(":8080", loggedRouter)
